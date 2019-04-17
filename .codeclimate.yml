@@ -1,0 +1,12 @@
+version: "0.0.1"
+plugins:
+    phpcodesniffer:
+        enabled: true
+        config:
+            standard: "Symfony"
+    phpmd:
+        enabled: true
+        config:
+            rulesets: "unusedcode,codesize,naming,design,controversial"
+  sonar-php:
+    enabled: false
