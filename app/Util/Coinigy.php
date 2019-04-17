@@ -3,19 +3,20 @@
  * Created by PhpStorm.
  * User: joeldg
  * Date: 1/7/18
- * Time: 1:00 AM
+ * Time: 1:00 AM.
  */
+
 namespace Bowhead\Util;
+
 /**
  * Class Coinigy
  * $coinigy_api = new Coinigy();
  * $coinigy_api->exchanges();
- * $coinigy_api->markets('OK');
+ * $coinigy_api->markets('OK');.
  *
  *  Originally from here https://github.com/coinigy/api/blob/master/example_v1.php
  *  I have added a few things below, but kept the original for the most part.
  *  Most especially I fixed the crazy spacing and formatting in the orginal file and added phpdoc blocks
- *
  */
 class Coinigy
 {
@@ -39,7 +40,7 @@ class Coinigy
     /**
      * Coinigy constructor.
      */
-    function __construct()
+    public function __construct()
     {
         //see API docs for more info
         $this->coinigy_api_key = \Bowhead\Traits\Config::bowhead_config('COINIGY_API');
@@ -51,6 +52,7 @@ class Coinigy
     {
         $post_arr = array();
         $result = $this->doWebRequest('userInfo', $post_arr);
+
         return $result;
     }
 
@@ -58,6 +60,7 @@ class Coinigy
     {
         $post_arr = array();
         $result = $this->doWebRequest('accounts', $post_arr);
+
         return $result;
     }
 
@@ -65,6 +68,7 @@ class Coinigy
     {
         $post_arr = array();
         $result = $this->doWebRequest('activity', $post_arr);
+
         return $result;
     }
 
@@ -74,9 +78,10 @@ class Coinigy
     public function balances($auth_ids)
     {
         $post_arr = array();
-        $post_arr["auth_ids"] = $auth_ids;
+        $post_arr['auth_ids'] = $auth_ids;
 
         $result = $this->doWebRequest('balances', $post_arr);
+
         return $result;
     }
 
@@ -84,6 +89,7 @@ class Coinigy
     {
         $post_arr = array();
         $result = $this->doWebRequest('pushNotifications', $post_arr);
+
         return $result;
     }
 
@@ -91,6 +97,7 @@ class Coinigy
     {
         $post_arr = array();
         $result = $this->doWebRequest('orders', $post_arr);
+
         return $result;
     }
 
@@ -98,6 +105,7 @@ class Coinigy
     {
         $post_arr = array();
         $result = $this->doWebRequest('alerts', $post_arr);
+
         return $result;
     }
 
@@ -105,6 +113,7 @@ class Coinigy
     {
         $post_arr = array();
         $result = $this->doWebRequest('exchanges', $post_arr);
+
         return $result;
     }
 
@@ -114,9 +123,10 @@ class Coinigy
     public function markets($exchange_code)
     {
         $post_arr = array();
-        $post_arr["exchange_code"] = $exchange_code;
+        $post_arr['exchange_code'] = $exchange_code;
 
         $result = $this->doWebRequest('markets', $post_arr);
+
         return $result;
     }
 
@@ -127,12 +137,12 @@ class Coinigy
     public function history($exchange_code, $exchange_market)
     {
         $post_arr = array();
-        $post_arr["exchange_code"] = $exchange_code;
-        $post_arr["exchange_market"] = $exchange_market;
-        $post_arr["type"] = "history";
-
+        $post_arr['exchange_code'] = $exchange_code;
+        $post_arr['exchange_market'] = $exchange_market;
+        $post_arr['type'] = 'history';
 
         $result = $this->doWebRequest('data', $post_arr);
+
         return $result;
     }
 
@@ -143,11 +153,12 @@ class Coinigy
     public function asks($exchange_code, $exchange_market)
     {
         $post_arr = array();
-        $post_arr["exchange_code"] = $exchange_code;
-        $post_arr["exchange_market"] = $exchange_market;
-        $post_arr["type"] = "asks";
+        $post_arr['exchange_code'] = $exchange_code;
+        $post_arr['exchange_market'] = $exchange_market;
+        $post_arr['type'] = 'asks';
 
         $result = $this->doWebRequest('data', $post_arr);
+
         return $result;
     }
 
@@ -158,15 +169,17 @@ class Coinigy
     public function bids($exchange_code, $exchange_market)
     {
         $post_arr = array();
-        $post_arr["exchange_code"] = $exchange_code;
-        $post_arr["exchange_market"] = $exchange_market;
-        $post_arr["type"] = "bids";
+        $post_arr['exchange_code'] = $exchange_code;
+        $post_arr['exchange_market'] = $exchange_market;
+        $post_arr['type'] = 'bids';
 
         $result = $this->doWebRequest('data', $post_arr);
+
         return $result;
     }
 
     //asks + bids + history
+
     /**
      * @param $exchange_code
      * @param $exchange_market
@@ -174,26 +187,27 @@ class Coinigy
     public function data($exchange_code, $exchange_market)
     {
         $post_arr = array();
-        $post_arr["exchange_code"] = $exchange_code;
-        $post_arr["exchange_market"] = $exchange_market;
-        $post_arr["type"] = "all";
+        $post_arr['exchange_code'] = $exchange_code;
+        $post_arr['exchange_market'] = $exchange_market;
+        $post_arr['type'] = 'all';
 
         $result = $this->doWebRequest('data', $post_arr);
+
         return $result;
     }
 
     //asks + bids
+
     /**
      * @param $exchange_code
      * @param $exchange_market
      */
     public function orders($exchange_code, $exchange_market)
     {
-
         $post_arr = array();
-        $post_arr["exchange_code"] = $exchange_code;
-        $post_arr["exchange_market"] = $exchange_market;
-        $post_arr["type"] = "orders";
+        $post_arr['exchange_code'] = $exchange_code;
+        $post_arr['exchange_market'] = $exchange_market;
+        $post_arr['type'] = 'orders';
 
         $result = $this->doWebRequest('data', $post_arr);
 
@@ -205,14 +219,15 @@ class Coinigy
         $post_arr = array();
 
         $result = $this->doWebRequest('newsFeed', $post_arr);
+
         return $result;
     }
-
 
     public function orderTypes()
     {
         $post_arr = array();
         $result = $this->doWebRequest('orderTypes', $post_arr);
+
         return $result;
     }
 
@@ -231,11 +246,11 @@ class Coinigy
      */
     public function refreshBalance($auth_id)
     {
-
         $post_arr = array();
-        $post_arr["auth_id"] = $auth_id;
+        $post_arr['auth_id'] = $auth_id;
 
         $result = $this->doWebRequest('refreshBalance', $post_arr);
+
         return $result;
     }
 
@@ -247,11 +262,12 @@ class Coinigy
     public function addAlert($exchange_code, $exchange_market, $alert_price)
     {
         $post_arr = array();
-        $post_arr["exch_code"] = $exchange_code;
-        $post_arr["market_name"] = $exchange_market;
-        $post_arr["alert_price"] = $alert_price;
+        $post_arr['exch_code'] = $exchange_code;
+        $post_arr['market_name'] = $exchange_market;
+        $post_arr['alert_price'] = $alert_price;
 
         $result = $this->doWebRequest('addAlert', $post_arr);
+
         return $result;
     }
 
@@ -261,9 +277,10 @@ class Coinigy
     public function deleteAlert($delete_alert_id)
     {
         $post_arr = array();
-        $post_arr["alert_id"] = $delete_alert_id;
+        $post_arr['alert_id'] = $delete_alert_id;
 
         $result = $this->doWebRequest('deleteAlert', $post_arr);
+
         return $result;
     }
 
@@ -280,18 +297,18 @@ class Coinigy
     public function addOrder($order_auth_id, $order_exch_id, $order_mkt_id, $order_type_id, $price_type_id, $limit_price, $stop_price, $order_quantity)
     {
         $post_arr = array();
-        $post_arr["auth_id"] = $order_auth_id;
-        $post_arr["exch_id"] = $order_exch_id;
-        $post_arr["mkt_id"] = $order_mkt_id;
-        $post_arr["order_type_id"] = $order_type_id;
-        $post_arr["price_type_id"] = $price_type_id;
-        $post_arr["limit_price"] =$limit_price;
-        $post_arr["stop_price"] = $stop_price;
-        $post_arr["order_quantity"] = $order_quantity;
+        $post_arr['auth_id'] = $order_auth_id;
+        $post_arr['exch_id'] = $order_exch_id;
+        $post_arr['mkt_id'] = $order_mkt_id;
+        $post_arr['order_type_id'] = $order_type_id;
+        $post_arr['price_type_id'] = $price_type_id;
+        $post_arr['limit_price'] = $limit_price;
+        $post_arr['stop_price'] = $stop_price;
+        $post_arr['order_quantity'] = $order_quantity;
 
         $result = $this->doWebRequest('addOrder', $post_arr);
-        return $result;
 
+        return $result;
     }
 
     /**
@@ -300,11 +317,11 @@ class Coinigy
     public function cancelOrder($cancel_order_id)
     {
         $post_arr = array();
-        $post_arr["internal_order_id"] = $cancel_order_id;
+        $post_arr['internal_order_id'] = $cancel_order_id;
 
         $result = $this->doWebRequest('cancelOrder', $post_arr);
-        return $result;
 
+        return $result;
     }
 
     /**
@@ -315,12 +332,10 @@ class Coinigy
      */
     private function doWebRequest($method, $post_arr)
     {
-
         $url = $this->endpoint.$method;
 
-        $headers = array('X-API-KEY: ' . $this->coinigy_api_key,
-            'X-API-SECRET: ' . $this->coinigy_api_secret);
-
+        $headers = array('X-API-KEY: '.$this->coinigy_api_key,
+            'X-API-SECRET: '.$this->coinigy_api_secret, );
 
         // our curl handle (initialize if required)
         static $ch = null;
@@ -333,22 +348,23 @@ class Coinigy
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_arr);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         $res = curl_exec($ch);
 
-        if ($res === false)  {
-            echo "CURL Failed - Check URL";
+        if (false === $res) {
+            echo 'CURL Failed - Check URL';
+
             return false;
         }
 
         $dec = json_decode($res, 1);
         if (!$dec) {
-            echo "Invalid JSON returned - Redirect to Login";
+            echo 'Invalid JSON returned - Redirect to Login';
+
             return false;
         }
 
         return $dec;
-
     }
 
     /**
@@ -356,20 +372,20 @@ class Coinigy
      */
     private function output_result($result)
     {
-        if($result)
-        {
-            if(isset($result->error))
+        if ($result) {
+            if (isset($result->error)) {
                 $this->pre($result->error);
-            elseif(isset($result))
+            } elseif (isset($result)) {
                 $this->pre($result);
+            }
         }
     }
 
     /**
      * @param $array
      */
-    private function pre($array) {
-        echo "<pre>".print_r($array, true)."</pre>";
+    private function pre($array)
+    {
+        echo '<pre>'.print_r($array, true).'</pre>';
     }
-
 }

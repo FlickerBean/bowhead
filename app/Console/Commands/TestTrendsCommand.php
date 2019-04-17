@@ -26,8 +26,6 @@ class TestTrendsCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -44,18 +42,18 @@ class TestTrendsCommand extends Command
         $console = new Console();
         $ind = new Indicators();
 //        $instruments = ['USD_JPY','NZD_USD','EUR_GBP','USD_CAD','USD_CNH','USD_MXN','USD_TRY','AUD_USD','EUR_USD','USD_CHF'];
-	    $instruments = ['BTC/USD','ETH/BTC','LTC/BTC'];
+        $instruments = ['BTC/USD', 'ETH/BTC', 'LTC/BTC'];
 
-        while(1) {
+        while (1) {
 //        	TODO hts is wrongly coded find solution!
 //            $all = ['httc','htl','hts','mmi'];
-	        $all = ['httc','htl','mmi'];
-            foreach($instruments as $instrument) {
-                $data = $this->getRecentData($instrument,200);
-                $trends[$instrument]['httc'] = $ind->httc($instrument, $data);      # Hilbert Transform - Trend vs Cycle Mode
-                $trends[$instrument]['htl']  = $ind->htl($instrument, $data);       # Hilbert Transform - Instantaneous Trendline
+            $all = ['httc', 'htl', 'mmi'];
+            foreach ($instruments as $instrument) {
+                $data = $this->getRecentData($instrument, 200);
+                $trends[$instrument]['httc'] = $ind->httc($instrument, $data);      // Hilbert Transform - Trend vs Cycle Mode
+                $trends[$instrument]['htl'] = $ind->htl($instrument, $data);       // Hilbert Transform - Instantaneous Trendline
 //                $trends[$instrument]['hts']  = $ind->hts($instrument, $data, true); # Hilbert Transform - Sinewave
-                $trends[$instrument]['mmi']  = $ind->mmi($instrument, $data);       # market meanness
+                $trends[$instrument]['mmi'] = $ind->mmi($instrument, $data);       // market meanness
             }
             $lines = [];
             $lines['top'] = '';
@@ -70,9 +68,9 @@ class TestTrendsCommand extends Command
                     $lines[$key] .= $console->colorize(str_pad($key, 17), $color, 'bold');
                 }
             }
-            echo "\n\n" . $console->colorize(@$lines['top']);
+            echo "\n\n".$console->colorize(@$lines['top']);
             foreach ($all as $val) {
-                echo "\n" . $lines[$val];
+                echo "\n".$lines[$val];
             }
             echo "\n\n";
             sleep(5);

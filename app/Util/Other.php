@@ -1,16 +1,13 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: joeldg
+ * User: joeldg.
  */
 
 namespace Bowhead\Util;
 
 /**
- * Class Other
- * @package Bowhead\Util
- *
- *              EXTRA not fully implemented methods.
+ * Class Other.
  */
 class Other
 {
@@ -18,17 +15,19 @@ class Other
      * @param $orders
      *
      * @return float|int
-     *  Volume weighted average price..
-     *  not fully implemented yet
+     *                   Volume weighted average price..
+     *                   not fully implemented yet
      */
-    public function vwap($orders) {
+    public function vwap($orders)
+    {
         $count = count($orders);
         $shares = $total = 0;
         foreach ($orders as $order) {
             $shares += $order['size'];
             $total += $order['size'] * $order['price'];
         }
-        return ($shares == 0 ? 0 : round($total/$shares,2));
+
+        return 0 == $shares ? 0 : round($total / $shares, 2);
     }
 
     /**
@@ -38,12 +37,12 @@ class Other
      *
      * @return array
      *
-     *          This is not fully implemented yet.
+     *          This is not fully implemented yet
      */
     public function ahrens_moving_average($input_data,	// data to be smoothed
                                    $period,		// smoothing window
-                                   $x_end) {	// end of input data
-
+                                   $x_end)
+    {	// end of input data
         //--------------------------------------------------------------
         // create the output array
 
@@ -58,7 +57,7 @@ class Other
         // first actual datapoint in the input series.
 
         $x_start = 1;
-        for ($a = $x_start; $a <= $x_end; $a++) {
+        for ($a = $x_start; $a <= $x_end; ++$a) {
             if (isset($input_data[$a]) && is_numeric($input_data[$a])) {
                 $x_start = $a;
                 break;
@@ -75,8 +74,8 @@ class Other
 
         $count = 0;
         $total = 0;
-        for ($a = $x_start; $a < $x_start + $period && $a <= $x_end; $a++) {
-            $count++;
+        for ($a = $x_start; $a < $x_start + $period && $a <= $x_end; ++$a) {
+            ++$count;
             $total += $input_data[$a];
             $avg[$a] = $total / $count;
         }
@@ -85,12 +84,11 @@ class Other
         // once the seed values have been calculated, shift gears and
         // calculate the AMA for $x_start + $period through $x_end
 
-        for ($a = $x_start + $period; $a <= $x_end; $a++) {
-            $numerator = $input_data[$a] - ($avg[$a-1] + $avg[$a-$period]) / 2;
-            $avg[$a]   = $avg[$a-1] + $numerator / $period;
+        for ($a = $x_start + $period; $a <= $x_end; ++$a) {
+            $numerator = $input_data[$a] - ($avg[$a - 1] + $avg[$a - $period]) / 2;
+            $avg[$a] = $avg[$a - 1] + $numerator / $period;
         }
 
         return $avg;
     }
-
 }

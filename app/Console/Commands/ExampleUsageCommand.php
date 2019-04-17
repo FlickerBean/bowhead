@@ -3,7 +3,6 @@
 namespace Bowhead\Console\Commands;
 
 use AndreasGlaser\PPC\PPC;
-use Bowhead\Traits\OHLC;
 use Bowhead\Util\Whaleclub;
 use Bowhead\Util\Bitfinex;
 use Bowhead\Util\Candles;
@@ -16,13 +15,7 @@ use Bowhead\Util\Console;
 use Illuminate\Console\Command;
 
 /**
- * Class ExampleUsageCommand
- * @package Bowhead\Console\Commands
- *
- *          This file is mostly to just verify that you have things working and have the
- *          keys for the API's in the right place.
- *
- *          If this file have errors, it should show you which one is in error..
+ * Class ExampleUsageCommand.
  */
 class ExampleUsageCommand extends Command
 {
@@ -42,8 +35,6 @@ class ExampleUsageCommand extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -58,29 +49,30 @@ class ExampleUsageCommand extends Command
     public function handle()
     {
         /** instantiate all the utils */
-        $candles    = new Candles();
+        $candles = new Candles();
         $indicators = new Indicators();
-        $math       = new Other(); // not really used
-        $console    = new Console();
+        $math = new Other(); // not really used
+        $console = new Console();
 
         /** instantiate all the brokerages */
 //        $whaleclub = new Whaleclub('BTC/USD');
 //        $onebroker = new OneBroker();
         $cointbase = new Coinbase();
-        $poloniex  = new PPC(env('POLONIEX_API'), env('POLONIEX_SECRET'));
-        $bitfinex  = new Bitfinex(env('BITFINIX_KEY'),env('BITFINIX_SECRET'));
+        $poloniex = new PPC(env('POLONIEX_API'), env('POLONIEX_SECRET'));
+        $bitfinex = new Bitfinex(env('BITFINIX_KEY'), env('BITFINIX_SECRET'));
 
         $stop = $warn = false;
 
         echo $console->colorize("\nSee the tutorial: \nhttps://medium.com/@joeldg/an-advanced-tutorial-a-new-crypto-currency-trading-bot-boilerplate-framework-e777733607a\n", 'yellow');
 
         if (!function_exists('trader_sma')) {
-            echo $console->colorize("\nYou are missing the required Trader extension http://php.net/manual/en/book.trader.php",'reverse');
+            echo $console->colorize("\nYou are missing the required Trader extension http://php.net/manual/en/book.trader.php", 'reverse');
             echo $console->colorize("\n`TO INSTALL:");
             echo $console->colorize("\n`curl -O http://pear.php.net/go-pear.phar`");
             echo $console->colorize("\n`sudo php -d detect_unicode=0 go-pear.phar`");
             echo $console->colorize("\n`sudo pecl install trader`\n");
             $stop = true;
+
             return null;
         }
 //        if (empty(env('WHALECLUB_TOKEN'))) {
@@ -104,7 +96,7 @@ class ExampleUsageCommand extends Command
 //        }
 
         if (empty(env('CBKEY'))) {
-            echo $console->colorize("\nSign up for a Coinbase/GDAX account: Use https://www.coinbase.com/join/51950ca286c21b84dd000021 for bonus",'yellow');
+            echo $console->colorize("\nSign up for a Coinbase/GDAX account: Use https://www.coinbase.com/join/51950ca286c21b84dd000021 for bonus", 'yellow');
             $warn = true;
         } else {
             $account = $cointbase->getAccount();
@@ -113,7 +105,7 @@ class ExampleUsageCommand extends Command
         }
 
         if (empty(env('BITFINIX_KEY'))) {
-            echo $console->colorize("\nSign up for a Bitfinex account: https://www.bitfinex.com",'red');
+            echo $console->colorize("\nSign up for a Bitfinex account: https://www.bitfinex.com", 'red');
             $stop = true;
         } else {
             $account = $bitfinex->account_info();
@@ -139,24 +131,24 @@ class ExampleUsageCommand extends Command
 
         if ($stop) {
             $console->buzzer();
-            echo $console->colorize("\nYou will need to sign up for the above accounts to use the example.\n\n", "red");
+            echo $console->colorize("\nYou will need to sign up for the above accounts to use the example.\n\n", 'red');
+
             return null;
         }
         if ($warn) {
             $console->buzzer();
-            echo $console->colorize("\nMissing API keys, You will want to sign up for the accounts above.\n\n", "yellow");
+            echo $console->colorize("\nMissing API keys, You will want to sign up for the accounts above.\n\n", 'yellow');
         }
 
-
-        for ($i = 0; $i <= 150; $i++) {
+        for ($i = 0; $i <= 150; ++$i) {
             usleep(10000);
-            $console ->progressBar($i, 150);
-            if ($i == 150) {
+            $console->progressBar($i, 150);
+            if (150 == $i) {
                 echo "\n";
             }
         }//*/
 
-        if($cand = $candles->allCandles()){
+        if ($cand = $candles->allCandles()) {
             echo $console->colorize("Candles on sample data\n");
             echo $console->tableFormatArray(array_dot($cand));
         } else {
@@ -164,14 +156,14 @@ class ExampleUsageCommand extends Command
             echo $console->colorize("\nCould not load candles, did you import the sample data?\n");
         }
 
-        if($ind = $indicators->allSignals()){
+        if ($ind = $indicators->allSignals()) {
             echo $console->colorize("Signals on sample data\n");
             echo $console->tableFormatArray(array_dot($ind));
         } else {
             echo $console->colorize("\nCould not load signals, did you import the sample data?\n");
         }
 
-        echo $console->colorize("\nLooks good",'green');
+        echo $console->colorize("\nLooks good", 'green');
         echo "\n";
     }
 }

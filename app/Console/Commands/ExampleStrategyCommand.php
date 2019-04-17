@@ -1,17 +1,14 @@
 <?php
+
 namespace Bowhead\Console\Commands;
 
-use Bowhead\Console\Kernel;
 use Bowhead\Traits\OHLC;
 use Illuminate\Console\Command;
 use Bowhead\Util;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
-use AndreasGlaser\PPC\PPC; // https://github.com/andreas-glaser/poloniex-php-client
+// https://github.com/andreas-glaser/poloniex-php-client
 
 /**
- * Class ExampleCommand
- * @package Bowhead\Console\Commands
+ * Class ExampleCommand.
  */
 class ExampleCommand extends Command
 {
@@ -59,60 +56,63 @@ class ExampleCommand extends Command
 
     protected $order_cooloff;
 
-
     /**
      * @return int
      */
     public function shutdown()
     {
-        if (!is_array($this->indicator_positions)){
+        if (!is_array($this->indicator_positions)) {
             return 0;
         }
-        foreach($this->indicator_positions as $key => $val) {
+        foreach ($this->indicator_positions as $key => $val) {
             echo "closing $key - $val\n";
             $this->wc->positionClose($val);
         }
+
         return 0;
     }
 
     public function doColor($val)
     {
-        if ($val == 0){ return 'none'; }
-        if ($val == 1){ return 'green'; }
-        if ($val == -1){ return 'magenta'; }
+        if (0 == $val) {
+            return 'none';
+        }
+        if (1 == $val) {
+            return 'green';
+        }
+        if (-1 == $val) {
+            return 'magenta';
+        }
+
         return 'none';
     }
 
-    /**
-     * @return null
-     *
-     *  this is the part of the command that executes.
-     */
     public function handle()
     {
         echo "PRESS 'q' TO QUIT AND CLOSE ALL POSITIONS\n\n\n";
         stream_set_blocking(STDIN, 0);
 
-        $instruments = ['BTC/USD','ETH/BTC','LTC/BTC'];
-        $util        = new Util\BrokersUtil();
-        $wc          = new Util\Whaleclub($this->instrument);
-        $console     = new \Bowhead\Util\Console();
-        $indicators  = new \Bowhead\Util\Indicators();
+        $instruments = ['BTC/USD', 'ETH/BTC', 'LTC/BTC'];
+        $util = new Util\BrokersUtil();
+        $wc = new Util\Whaleclub($this->instrument);
+        $console = new \Bowhead\Util\Console();
+        $indicators = new \Bowhead\Util\Indicators();
 
         $this->wc = $wc;
-        register_shutdown_function(array($this, 'shutdown'));  //
+        register_shutdown_function(array($this, 'shutdown'));
 
-        /**
+        /*
          *  Enter a loop where we check the strategy every minute.
          */
-        while(1) {
-            if (ord(fgetc(STDIN)) == 113) { // try to catch keypress 'q'
-                echo "QUIT detected...";
+        while (1) {
+            if (113 == ord(fgetc(STDIN))) { // try to catch keypress 'q'
+                echo 'QUIT detected...';
+
                 return null;
             }
             echo "\n";
 
-            foreach($instruments as $instrument) {
+            foreach ($instruments as $instrument) {
                 $underbought = $overbought = 0;
                 $recentData = $this->getRecentData($instrument);
 
@@ -120,19 +120,19 @@ class ExampleCommand extends Command
                 $cmo = $indicators->cmo($instrument, $recentData);
                 $mfi = $indicators->mfi($instrument, $recentData);
 
-                /** instrument is overbought, we will short */
-                if ($cci == -1 && $cmo == -1 && $mfi == -1) {
+                /* instrument is overbought, we will short */
+                if (-1 == $cci && -1 == $cmo && -1 == $mfi) {
                     $overbought = 1;
                 }
-                /** It is underbought, we will go LONG */
-                if ($cci == 1 && $cmo == 1 && $mfi == 1) {
+                /* It is underbought, we will go LONG */
+                if (1 == $cci && 1 == $cmo && 1 == $mfi) {
                     $underbought = 1;
                 }
 
-                /**
+                /*
                  *   THIS SECTION IS FOR DISPLAY
                  */
-	            $indicators->fsar($instrument, $recentData);
+                $indicators->fsar($instrument, $recentData);
                 $line = $console->colorize(" Signals for $instrument:");
                 $line .= $console->colorize(str_pad("cci:$cci", 11), $this->doColor($cci));
                 $line .= $console->colorize(str_pad("cmo:$cmo", 9), $this->doColor($cmo));
@@ -141,7 +141,7 @@ class ExampleCommand extends Command
                 $line .= ($underbought ? $console->colorize(' underbought', 'light_green') : $console->colorize(' underbought', 'dark'));
                 echo "\n$line";
 
-                /**
+                /*
                  *  DISPLAY DONE
                  */
 
@@ -149,12 +149,7 @@ class ExampleCommand extends Command
                     $console->buzzer();
                     $current_price = array_pop($recentData['close']);
                     $order = [
-                        'direction' => 'short'
-                        , 'market' => 'BTC/USD'
-                        , 'leverage' => 20
-                        , 'stop_loss' => $current_price + 50
-                        , 'take_profit' => $current_price - 100
-                        , 'size' => 0.1
+                        'direction' => 'short', 'market' => 'BTC/USD', 'leverage' => 20, 'stop_loss' => $current_price + 50, 'take_profit' => $current_price - 100, 'size' => 0.1,
                     ];
                     $position = $wc->positionNew($order);
                     $console->colorize("\nOPENED NEW SHORT POSIITION");
@@ -164,21 +159,14 @@ class ExampleCommand extends Command
                     $console->buzzer();
                     $current_price = array_pop($recentData['close']);
                     $order = [
-                        'direction' => 'long'
-                        , 'market' => 'BTC/USD'
-                        , 'leverage' => 20
-                        , 'stop_loss' => $current_price - 50
-                        , 'take_profit' => $current_price + 100
-                        , 'size' => 0.1
+                        'direction' => 'long', 'market' => 'BTC/USD', 'leverage' => 20, 'stop_loss' => $current_price - 50, 'take_profit' => $current_price + 100, 'size' => 0.1,
                     ];
                     $position = $wc->positionNew($order);
                     $console->colorize("\nOPENED NEW LONG POSIITION");
                     print_r($position);
                 }
             }
-           sleep(8);
+            sleep(8);
         }
     }
-
-
 }

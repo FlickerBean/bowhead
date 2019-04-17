@@ -3,17 +3,17 @@
  * Created by PhpStorm.
  * User: joeldg
  * Date: 4/12/17
- * Time: 4:20 PM
+ * Time: 4:20 PM.
  */
 
 namespace Bowhead\Console\Commands;
 
-use Bowhead\Console\Kernel;
 use Illuminate\Console\Command;
 use DateInterval;
 use DateTime;
 
-class GetHistoricalCommand extends Command {
+class GetHistoricalCommand extends Command
+{
     /**
      * @var string
      */
@@ -33,7 +33,7 @@ class GetHistoricalCommand extends Command {
         $console = new \Bowhead\Util\Console();
         $ledger = new \Bowhead\Util\Coinbase();
 
-        #$data = $ledger->get_instruments();
+        //$data = $ledger->get_instruments();
         $pairs = explode(',', env('PAIRS'));
 
         $date_list = array();
@@ -41,10 +41,10 @@ class GetHistoricalCommand extends Command {
         $diff1Day = new DateInterval('P1D');
         $today = date('Y-m-d');
         $day = new DateTime($today.' 00:00:00');
-        while($day1 <= date('Y-m-d')) {
-            $day1 = date("Y-m-d", $day->getTimestamp());
+        while ($day1 <= date('Y-m-d')) {
+            $day1 = date('Y-m-d', $day->getTimestamp());
             $day->add($diff1Day);
-            $date_list[$day1] = date("Y-m-d", $day->getTimestamp());
+            $date_list[$day1] = date('Y-m-d', $day->getTimestamp());
         }
 
         foreach ($pairs as $pair) {
@@ -65,7 +65,7 @@ class GetHistoricalCommand extends Command {
                         'high' => $d[2],
                         'open' => $d[3],
                         'close' => $d[4],
-                        'volume' => $d[5]
+                        'volume' => $d[5],
                     );
                     $count = \DB::table('historical')->select('*')
                         ->where('pair', $pair)
@@ -77,6 +77,5 @@ class GetHistoricalCommand extends Command {
                 }
             }
         }
-
     }
 }

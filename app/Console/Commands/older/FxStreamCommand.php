@@ -1,4 +1,5 @@
 <?php
+
 namespace Bowhead\Console\Commands;
 
 use Bowhead\Traits\OHLC;
@@ -24,41 +25,31 @@ class FxStreamCommand extends Command
      */
     protected $description = 'The Fx stream processor.';
 
-        /**
+    /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle()
     {
         $console = new Console();
         $oneforgekey = env('ONEFORGE_API');
-        $instruments = ['USDJPY','EURUSD','AUDUSD','EURGBP','USDCAD','USDCHF','USDMXN','USDTRY','USDCNH','NZDUSD'];
+        $instruments = ['USDJPY', 'EURUSD', 'AUDUSD', 'EURGBP', 'USDCAD', 'USDCHF', 'USDMXN', 'USDTRY', 'USDCNH', 'NZDUSD'];
         $trans = [
-             'USDJPY' => 'USD_JPY'
-            ,'EURUSD' => 'EUR_USD'
-            ,'AUDUSD' => 'AUD_USD'
-            ,'EURGBP' => 'EUR_GBP'
-            ,'USDCAD' => 'USD_CAD'
-            ,'USDCHF' => 'USD_CHF'
-            ,'USDMXN' => 'USD_MXN'
-            ,'USDTRY' => 'USD_TRY'
-            ,'USDCNH' => 'USD_CNH'
-            ,'NZDUSD' => 'NZD_USD'
+             'USDJPY' => 'USD_JPY', 'EURUSD' => 'EUR_USD', 'AUDUSD' => 'AUD_USD', 'EURGBP' => 'EUR_GBP', 'USDCAD' => 'USD_CAD', 'USDCHF' => 'USD_CHF', 'USDMXN' => 'USD_MXN', 'USDTRY' => 'USD_TRY', 'USDCNH' => 'USD_CNH', 'NZDUSD' => 'NZD_USD',
         ];
 
         stream_set_blocking(STDIN, 0);
         $output = $last = [];
-        while(1){
-            if (ord(fgetc(STDIN)) == 113) {
-                echo "QUIT detected...";
+        while (1) {
+            if (113 == ord(fgetc(STDIN))) {
+                echo 'QUIT detected...';
+
                 return null;
             }
 
             $data = file_get_contents('http://rates.fxcm.com/RatesXML');
             $fixed = new SimpleXMLElement($data);
 
-	        $curr = [];
+            $curr = [];
             foreach ($fixed as $fx) {
                 $symbol = (string) $fx['Symbol'];
                 $symbolt = $trans[$symbol] ?? null;
@@ -70,7 +61,7 @@ class FxStreamCommand extends Command
                 $ticker['tick']['bid'] = round(((float) $fx->Bid + (float) $fx->Ask) / 2, 5);
                 $ticker['tick']['instrument'] = $symbolt;
 
-// TODO disable this old function while we check the rest of the code
+                // TODO disable this old function while we check the rest of the code
 //                $this->markOHLC($ticker);
 
                 $ins = $ticker['tick']['instrument'];
@@ -78,19 +69,18 @@ class FxStreamCommand extends Command
 
                 foreach ($curr as $instrument => $bid) {
                     if ($curr[$instrument] > ($last[$instrument] ?? 0)) {
-                        $output[$instrument] = $console->colorize(str_pad($instrument . " " . round($curr[$instrument], 3), 14), 'green', 'bold');
+                        $output[$instrument] = $console->colorize(str_pad($instrument.' '.round($curr[$instrument], 3), 14), 'green', 'bold');
                     } elseif ($curr[$instrument] < ($last[$instrument] ?? 0)) {
-                        $output[$instrument] = $console->colorize(str_pad($instrument . " " . round($curr[$instrument], 3), 14), 'bg_red', 'bold');
+                        $output[$instrument] = $console->colorize(str_pad($instrument.' '.round($curr[$instrument], 3), 14), 'bg_red', 'bold');
                     } else {
-                        $output[$instrument] = $console->colorize(str_pad($instrument . " " . round($curr[$instrument], 3), 14), 'none');
+                        $output[$instrument] = $console->colorize(str_pad($instrument.' '.round($curr[$instrument], 3), 14), 'none');
                     }
                 }
-
             }
-	        $last = $curr;
+            $last = $curr;
 
             // for cool output uncomment
-            echo join(' | ', $output) ."\n";
+            echo join(' | ', $output)."\n";
             sleep(12);
         }
     }

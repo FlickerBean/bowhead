@@ -24,8 +24,6 @@ class Forecast extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @return void
      */
     public function __construct()
     {
@@ -37,37 +35,38 @@ class Forecast extends Command
      *
      * @return mixed
      */
-    public function handle() {
+    public function handle()
+    {
+        $which = 'close';
+        $pair = 'BTC-USD';
+        $a = \DB::table('historical')
+                ->select('*')
+                ->where('pair', $pair)
+                ->orderby('buckettime', 'DESC')
+                ->limit(24 * 7)
+                ->get();
 
-	    $which='close';
-	    $pair='BTC-USD';
-	    $a = \DB::table('historical')
-	            ->select('*')
-	            ->where('pair', $pair)
-	            ->orderby('buckettime', 'DESC')
-	            ->limit(24*7)
-	            ->get();
+        $csv = "seq,id,curr,close,open,volume,zero\n";
+        $_csv = array();
+        foreach ($a as $stuff) {
+            $_csv[] = "'".$stuff->buckettime."',".$stuff->id.",'".$stuff->pair."',".(float) $stuff->close.','.(float) $stuff->open.','.(float) $stuff->volume.",0\n";
+        }
+        $__csv = array_reverse($_csv);
+        $ccsv = join('', $__csv);
+        $csv .= trim($ccsv);
 
-	    $csv = "seq,id,curr,close,open,volume,zero\n";
-	    $_csv = array();
-	    foreach($a as $stuff) {
-		    $_csv[] = "'".$stuff->buckettime ."',". $stuff->id .",'". $stuff->pair . "'," . (float)$stuff->close .','.(float)$stuff->open.','.(float)$stuff->volume.",0\n";
-	    }
-	    $__csv = array_reverse($_csv);
-	    $ccsv = join ("", $__csv);
-	    $csv .= trim($ccsv);
+        \Cache::put('tempbook', $csv, 5); // we use redis to pass this to python
 
-	    \Cache::put('tempbook',$csv,5); // we use redis to pass this to python
+        echo array_pop($__csv)."\n";
+        $doing = base_path()."/app/Scripts/$which".'_prediction.py';
+        $process = new Process("python -W ignore $doing");
+        $process->run();
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+        $out = explode(',', $process->getOutput());
 
-	    echo array_pop($__csv) . "\n";
-	    $doing = base_path() . "/app/Scripts/$which"."_prediction.py";
-	    $process = new Process("python -W ignore $doing");
-	    $process->run();
-	    // executes after the command finishes
-	    if (!$process->isSuccessful()) {
-		    throw new ProcessFailedException($process);
-	    }
-	    $out = explode(',', $process->getOutput());
-	    return round(array_pop($out),2);
+        return round(array_pop($out), 2);
     }
 }
